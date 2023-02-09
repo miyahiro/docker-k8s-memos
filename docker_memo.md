@@ -1,4 +1,13 @@
-## Command lines
+# Docker講座メモ
+
+## 参考情報
+
+[Udemy講座：元Microsoftエンジニアが教える、ドッカーの理論と実践コース。Docker（docker-compose含む）を1から学びを図解で解説。また現場目線のベストプラクティスとサンプルWebアプリ構築のコーディングチャレンジも含む。](https://uniadexjp.udemy.com/course/linux-docker-compose-dockerfile-kanzennyumon/learn/lecture/20662064
+)
+
+[本家Dockerドキュメント（ja）](https://docs.docker.jp/index.html)
+
+## DockerのCommand Lines
 
 ```sh
 # Dockerに関する情報を表示する
@@ -417,36 +426,6 @@ networks:
   back-tier:
     driver: bridge
     name: back-tier
-```
-
-### サンプル-Not Support Rreplica
-
-```yaml
-version: 3.7
-services:
-  nginx:
-    image: nginx:latest
-    container_name: docker_compose_nginx
-    environment:
-    - env_key=env_value
-    ports:
-    - 80:80
-    volumes:
-    - ${PWD}:/usr/share/nginx/html:ro
-  ubuntu:
-    image: ubuntu
-    container_name: docker_compose_ubuntu
-    command:
-    - sleep
-    - "1500"
-    ports:
-    - 8080:8080
-  busybox:
-    image: busybox
-    container_name: docker_compose_busybox
-    command:
-    - "sleep"
-    - "1500"
 ```
 
 ### サンプル-Support Rreplica
