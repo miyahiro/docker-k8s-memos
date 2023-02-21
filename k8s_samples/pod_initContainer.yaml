@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: date-tail
+spec:
+  # Podの起動前に実行されるコンテナ
+  # この順番で実行される
+  initContainers:
+  - name: step1
+    image: alpine
+    command: ["sh", "-c"]
+    args:
+    - |
+      echo Start at `date`; sleep 5; echo End.
+  - name: step2
+    image: alpine
+    command: ["sh", "-c"]
+    args:
+    - |
+      echo Start at `date`; sleep 5; echo End.
+  - name: step3
+    image: alpine
+    command: ["sh", "-c"]
+    args:
+    - |
+      echo Start at `date`; sleep 5; echo End.
+  containers:
+  -
+    name: date
+    image: alpine
+    command: ["sh", "-c"]
+    args:
+    - |
+      exec >> /var/log/date-tail/output.log
+      echo -n 'Start at: '
+      while true; do
+        date
+        sleep 1
+      done
+    volumeMounts:
+    - 
+      # ボリューム log-volume をマウント
+      name: log-volume
+      # マウント先を /var/log/date-tail とする
+      mountPath: /var/log/date-tail
+  -
+    name: tail
+    image: alpine
+    command: ["sh", "-c"]
+    args:
+    - |
+      tail -f /var/log/date-tail/output.log
+    volumeMounts:
+    - name: log-volume
+      mountPath: /var/log/date-tail
+  # ボリュームの定義
+  volumes:
+  - 
+    # log-volume とう名前のボリュームを作成
+    name: log-volume
+    # ボリュームのタイプはemptyDir
+    emptyDir:
+  # Podのリスタートは行わない
+  restartPolicy: Never
+# 以下のエラーが出たためコメントアウト
+# ```log
+# ValidationError(Pod): unknown field "terminationGracePeriodSeconds" in io.k8s.api.core.v1.Pod;
+# ```
+# terminationGracePeriodSeconds: 0

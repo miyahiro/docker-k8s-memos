@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+# リソースのタイプがResplicaSetであることを指定
+kind: ReplicaSet
+metadata:
+  name: nginx
+spec:
+  # 起動するPodの数を3に指定
+  replicas: 5
+  # 起動するPodの選択設定
+  selector:
+    # マッチしたラベルに対応付けられているPod Templateを使用する
+    matchLabels:
+      # template.metadata.labels配下のキーappの値がnginxのPodのテンプレートを使用することを示している
+      app: nginx
+
+    # マッチしたラベルに対応付けられているPod Templateを使用する
+    # matchLabelsよりも詳細な設定が可能
+    # matchExpressions:
+    # - 
+      # キーappについての条件
+      # key: app
+      # appの値がvaluesに含まれる
+      # このほかにもoperatorには NotIn, Exists, DoesNotExists が指定できる
+      # operator: In
+      # 値の条件
+      # values: [nginx, httpd]
+      
+  # Podのテンプレートを定義する
+  template:
+    # Podのテンプレートのメタデータ
+    metadata:
+      # Podテンプレートのラベル
+      # selectorで指定した値と同じにする必要がある
+      labels:
+        # ラベルとしてキーが app でその値が nginx を設定
+        app: nginx
+    # Pod Templateの仕様を定義する
+    spec:
+      # Pod内で動作するコンテナを定義する
+      containers:
+      -
+        image: nginx
+        name: nginx

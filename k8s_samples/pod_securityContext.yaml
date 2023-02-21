@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fsgroup-test
+spec:
+  containers:
+  -
+    image: alpine
+    name: alpin
+    command: ["tail", "-f", "/dev/null"]
+    # コンテナのセキュリティコンテキスト
+    securityContext:
+      # 親プロセスよりも多くの権限を取得できるようになるかを指定する.
+      # 特権モードで実行されていて CAP_SYS_ADMIN の Capability を持つ場合、
+      # このパラメータは常に True になる.
+      # allowPrivilegeEscalation: false
+      
+      # Capabilityの追加や削除を指定できる.
+      # デフォルトのコンテナランタイムから指定されているものが設定される.
+      # add と drop というフィールドにリストで指定する.
+      # capabilities:
+      #   add:
+      #   - CAP_SETUID
+      #   - CAP_SETGID
+      #   drop:
+      #   - CAP_SYS_ADMIN
+      
+      # コンテナを特権モードで動作させるかを指定する.
+      # 特権モードのコンテナのプロセスは基本的にホスト上のrootと同等の権限を持つ.
+      # privileged: false
+      
+      # コンテナのprocマウントのタイプを指定する.
+      # デフォルトは　DefaultProcMountが使用される.
+      # よくわからない.
+      # procMount: DefaultProcMount
+      # 
+    
+      # コンテナの」ルートファイルシステムを読み込み専用にするかを指定する.
+      # デフォルトは False.
+      readOnlyRootFilesystem: false
+      
+      # PodのsecurityContextにもあるが、以下の値がコンテナのsecurityContextに
+      # 設定されていた場合、そちらを優先する.
+      # それぞれの項目の意味についてはPodのsecurityContextのコメントを参照のこと.
+      runAsUser: 11211
+      # runAsGroup: 1001
+      runAsNonRoot: true
+      # seLinuxOptions:
+      capabilities:
+        drop:
+        - SYS_ADMIN
+        - NET_ADMIN
+    volumeMounts:
+    -
+      name: data
+      mountPath: /data
+  # セキュリティコンテキスト
+  securityContext:
+    # コンテナのプロセスのUIDを指定する.
+    # 指定されていない場合は小手なイメージに指定されているものを使う.
+    # runAsUser: 1001
+    
+    # コンテナのプロセスのGIDを指定する.
+    # 指定されていない場合は実行時のデフォルトが使用される.
+    # runAsGroup: 1001
+
+    # コンテナのプロセスのGIDに加えて追加したいgroupsをリストで指定する.
+    # supplementalGroups:
+    # - 1002      
+    # - 1003      
+    
+    # Trueを設定した場合、コンテナのプロセスがRootで動いているかをチックする.
+    # Rootで動作した場合、起動に失敗する.
+    # runAsNonRoot: true
+
+    # ファイル所有グループをグループIDが1000のグループに設定
+    # kubectl exec -it fsgroup-test -- ls -l | grep data
+    # で確認
+    #
+    # 実行ユーザのユーザもグループIDが1000のグループに属するようになる
+    # kubectl exec -it fsgroup-test -- id -G
+    # で確認
+    fsGroup: 1000
+      
+    # SELinuxのコンテキストを指定する.
+    # 指定されなかった場合はランダムなコンテキストが割り当てられる.
+    # seLinuxOptions:
+
+    # sysctlのパラメータをリストで指定する.
+    # コンテナランタイムがサポートしていない場合は起動に失敗する.
+    # sysctls:
+  volumes:
+  -
+    name: data
+    # emptyDirの場合ファイルやディレクトリのパーミッションは 0777 でマウントされてしまう.
+    emptyDir:

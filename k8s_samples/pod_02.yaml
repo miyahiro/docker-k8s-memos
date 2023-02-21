@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - 
+      # コンテナ名。フォーマットは`DNS_LABEL`に従っていること.
+      name: nginx
+      # 使用するイメージを指定
+      image: nginx:alpine
+      # イメージをPullするポリシーを指定
+      # Always: 常にコンテナイメージをPullする
+      # IfNotPresent: すでにコンテナイメージがあればPullを実行しない
+      # Never: Pullを実行しない。ローカルにコンテナイメージがあることを期待する
+      # このパラメータを省略した際はimageの値をもとに挙動が変化する。
+      # コンテナイメージのタグがlatest: Alwaysが適用
+      # コンテナイメージのタグがlatestでない: IfNotPresentが適用
+      imagePullPolicy: Always
+      # Entrypoingの配列を指定
+      # 指定しない場合はDockerイメージのENTRYPOINTが使用される.
+      command: []
+      # 引数配列を指定.
+      # 指定しない場合はDockerイメージのCMDが使用される.
+      args: ["nginx", "-g", "daemon off;"]
+      # 環境変数を指定
+      env:
+      - name: HOGEHOGE
+        value: fugafuga
+      # ポートを指定
+      ports:
+      - 
+        # NamedPortとして使用する際の名前を指定。Pod内でユニークである必要がある
+        name: http
+        # PodのIPからExposeするポート番号
+        containerPort: 80
+        # プロトコルを指定。TCP/UDP/SCTPから指定。デフォルトはTCP。
+        protocol: TCP
+      # 小手ナノワーキングディレクトリ。
+      # 省略された場合、Container Runtimeのデフォルトが使用される。
+      # コンテナイメージで指定されている際、それが使用される可能性がある。
+      workingDir: /tmp
